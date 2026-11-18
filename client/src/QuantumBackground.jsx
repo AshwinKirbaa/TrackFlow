@@ -1,0 +1,11 @@
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+
+export default function QuantumBackground(){
+ const root=useRef(null);
+ useEffect(()=>{const host=root.current;if(!host)return;const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,300);camera.position.set(0,0,42);const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);host.appendChild(renderer.domElement);
+ const group=new THREE.Group();scene.add(group);const material=new THREE.MeshBasicMaterial({color:0xd8ff3e,wireframe:true,transparent:true,opacity:.13});for(let i=0;i<16;i++){const mesh=new THREE.Mesh(new THREE.BoxGeometry(5+i*.55,2.2+i*.18,.7),material.clone());mesh.position.set(18+Math.sin(i)*6,-13+i*2.05,-i*2);mesh.rotation.set(.13,i*.08,.12);mesh.material.opacity=.16-i*.006;group.add(mesh)}
+ const count=90,positions=new Float32Array(count*3);for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*75;positions[i*3+1]=(Math.random()-.5)*48;positions[i*3+2]=(Math.random()-.5)*45}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));const points=new THREE.Points(geo,new THREE.PointsMaterial({color:0xe9ebe5,size:.075,transparent:true,opacity:.42}));scene.add(points);
+ let x=0,y=0,frame;const move=e=>{x=(e.clientX/innerWidth-.5)*2;y=(e.clientY/innerHeight-.5)*2},resize=()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)};addEventListener('mousemove',move);addEventListener('resize',resize);const tick=()=>{frame=requestAnimationFrame(tick);group.rotation.y+=(x*.08-group.rotation.y)*.025;group.rotation.x+=(-y*.045-group.rotation.x)*.025;group.position.y=Math.sin(performance.now()*.00025)*.7;points.rotation.y+=.00012;renderer.render(scene,camera)};tick();return()=>{cancelAnimationFrame(frame);removeEventListener('mousemove',move);removeEventListener('resize',resize);renderer.dispose();host.replaceChildren()}},[]);
+ return <div ref={root} className="quantum-canvas-container" aria-hidden="true"/>;
+}
