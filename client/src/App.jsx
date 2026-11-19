@@ -11,6 +11,35 @@ const SAMPLE = [
 ];
 function Mark(){return <span className="mark" aria-hidden="true"><i/><i/><i/></span>}
 
+function ConfirmDialog({title,message,onConfirm,onCancel}){
+  return (
+    <div className="modal-backdrop" onClick={onCancel}>
+      <div className="modal-sheet" onClick={e=>e.stopPropagation()}>
+        <header>
+          <span className="eyebrow">ACTION CONFIRMATION</span>
+          <h3>{title||'Remove this task?'}</h3>
+        </header>
+        <p>{message||'This action will permanently purge this object from your workspace.'}</p>
+        <div className="modal-actions">
+          <button type="button" onClick={onCancel}>Cancel</button>
+          <button type="button" className="danger-action" onClick={onConfirm}>Confirm Removal ↗</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Toast({message,onClose}){
+  useEffect(()=>{const id=setTimeout(onClose,3500);return()=>clearTimeout(id)},[message]);
+  return (
+    <div className="toast" role="status">
+      <span className="signal on"/>
+      <span>{message}</span>
+      <button type="button" onClick={onClose} aria-label="Close notification">×</button>
+    </div>
+  );
+}
+
 function Auth({onAuth,onPreview}){
   const [mode,setMode]=useState('login'),[form,setForm]=useState({name:'',email:'',password:''}),[error,setError]=useState(''),[busy,setBusy]=useState(false);
   const field=k=>e=>setForm({...form,[k]:e.target.value});
